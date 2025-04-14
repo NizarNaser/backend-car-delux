@@ -15,7 +15,10 @@ const port =3000
 
 //middeleware
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+    origin: "https://nizarnaser.github.io", // 👈 السماح فقط لواجهة GitHub Pages
+    credentials: true
+  }));
 app.use(express.urlencoded({ extended: true }));
 //db connection
 connectDB();
