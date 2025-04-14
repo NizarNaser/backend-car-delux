@@ -15,8 +15,11 @@ const port =3000
 
 //middeleware
 app.use(express.json())
+// ✅ السماح فقط لموقع GitHub Pages
 app.use(cors({
-    origin: "https://nizarnaser.github.io", // 👈 السماح فقط لواجهة GitHub Pages
+    origin: "https://nizarnaser.github.io",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
   }));
 app.use(express.urlencoded({ extended: true }));
