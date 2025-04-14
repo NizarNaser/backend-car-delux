@@ -6,7 +6,6 @@
   "type": "module",
   "homepage": "https://nizarnaser.github.io/backend-car-delux",
   "scripts": {
-    
     "start": "node server.js"
   },
   "author": "Nizar Naser",
@@ -22,6 +21,7 @@
     "mongose": "^0.0.2-security",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.9",
+    "statuses": "^2.0.1",
     "stripe": "^17.7.0",
     "validator": "^13.12.0"
   },

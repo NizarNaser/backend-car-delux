@@ -1,0 +1,3 @@
+git add .
+git commit -m "تحديثات جديدة"
+git push origin main
