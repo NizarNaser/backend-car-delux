@@ -5,6 +5,7 @@ import { storage } from "../config/cloudinary.js"; // ✅ استخدم التخ�
 
 
 const upload = multer({storage})
+const carRoute = express.Router();
 carRoute.post("/add", upload.single("image"), addCar);
   carRoute.get("/one-item/:id",getOneCar)
   carRoute.put("/update-item/:id",upload.single("image"),updateCar)
