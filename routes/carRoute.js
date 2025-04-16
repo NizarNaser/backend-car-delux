@@ -1,31 +1,30 @@
 import express from "express"
-import { addCar ,listCar,removeCar,getOneCar,updateCar,addExpense,getOneExpense,updateExpense,listExpense,removeExpense,getCarsByDate,getExpenseByDate,listExpenseCar} from "../controllers/carController.js"
-import path from "path"
+import { addCar, listCar, removeCar, getOneCar, updateCar ,addExpense,getOneExpense,updateExpense,listExpense,removeExpense,getCarsByDate,getExpenseByDate,listExpenseCar} from "../controllers/carController.js"
 import multer from "multer"
 import { storage } from "../config/cloudinary.js"; // ✅ استخدم التخزين السحابي
 
 
 const upload = multer({storage})
-carRouter.post("/add", upload.single("image"), addCar);
-  carRouter.get("/one-item/:id",getOneCar)
-  carRouter.put("/update-item/:id",upload.single("image"),updateCar)
-  carRouter.get("/list",listCar)
-  carRouter.post("/remove",removeCar)
+carRoute.post("/add", upload.single("image"), addCar);
+  carRoute.get("/one-item/:id",getOneCar)
+  carRoute.put("/update-item/:id",upload.single("image"),updateCar)
+  carRoute.get("/list",listCar)
+  carRoute.post("/remove",removeCar)
   // جلب السيارات حسب تاريخ الإنشاء (createdAt)
   carRouter.get("/car-by-date", getCarsByDate);
 // مثال: http://localhost:5000/api/cars/by-date?start=2025-04-01&end=2025-04-08
 
   //expenses
-  carRouter.post("/add-expense", addExpense);
-  carRouter.get("/one-expense/:id",getOneExpense)
-  carRouter.put("/update-expense/:id",updateExpense)
-  carRouter.get("/list-expense",listExpense)
-  carRouter.post("/remove-expense",removeExpense)
-  carRouter.get("/expense-by-date", getExpenseByDate);
-  carRouter.get("/list-car-expense/:id", listExpenseCar);
-carRouter.use("/uploads",express.static("uploads"));
+  carRoute.post("/add-expense", addExpense);
+  carRoute.get("/one-expense/:id",getOneExpense)
+  carRoute.put("/update-expense/:id",updateExpense)
+  carRoute.get("/list-expense",listExpense)
+  carRoute.post("/remove-expense",removeExpense)
+  carRoute.get("/expense-by-date", getExpenseByDate);
+  carRoute.get("/list-car-expense/:id", listExpenseCar);
+carRoute.use("/uploads",express.static("uploads"));
 
 
 
-export default carRouter;
+export default carRoute;
 
