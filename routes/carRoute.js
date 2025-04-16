@@ -12,7 +12,7 @@ carRoute.post("/add", upload.single("image"), addCar);
   carRoute.get("/list",listCar)
   carRoute.post("/remove",removeCar)
   // جلب السيارات حسب تاريخ الإنشاء (createdAt)
-  carRouter.get("/car-by-date", getCarsByDate);
+  carRoute.get("/car-by-date", getCarsByDate);
 // مثال: http://localhost:5000/api/cars/by-date?start=2025-04-01&end=2025-04-08
 
   //expenses
