@@ -2,33 +2,11 @@ import express from "express"
 import { addCar ,listCar,removeCar,getOneCar,updateCar,addExpense,getOneExpense,updateExpense,listExpense,removeExpense,getCarsByDate,getExpenseByDate,listExpenseCar} from "../controllers/carController.js"
 import path from "path"
 import multer from "multer"
-import fs from "fs"
+import { storage } from "../config/cloudinary.js"; // ✅ استخدم التخزين السحابي
 
-const carRouter = express.Router();
-// إنشاء مجلد `uploads` تلقائيًا إذا لم يكن موجودًا
-const uploadDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-// Image Storage Engine
-
-const storage = multer.diskStorage({
-    destination:(req,file,cb)=>{
-        
-        cb(null,"uploads/")},
-    filename:(req,file,cb)=>{
-        cb(null, Date.now() +path.extname(file.originalname));
-    }
-})
 
 const upload = multer({storage})
-carRouter.post("/add", upload.single("image"), (req, res, next) => {
-    
-    if (!req.file) {
-      return res.state(400).json({ error: "No image uploaded in middleware" });
-    }
-    next();
-  }, addCar);
+carRouter.post("/add", upload.single("image"), addCar);
   carRouter.get("/one-item/:id",getOneCar)
   carRouter.put("/update-item/:id",upload.single("image"),updateCar)
   carRouter.get("/list",listCar)

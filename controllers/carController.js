@@ -1,12 +1,28 @@
 import carModel from "../models/carModel.js";
 import expenseModel from "../models/expenseModel.js";
 import fs from "fs"
+import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudinary
 
 
 //add car item
-
 const addCar = async (req, res) => {
-    let image_filename = req.file.filename;
+    console.log("–– BODY ––", req.body);
+console.log("–– FILE ––", req.file);
+    // تحقق من وجود الصورة في الطلب
+    if (!req.file) {
+        return res.status(400).json({ success: false, message: "No image uploaded" });
+    }
+
+    // معالجة بيانات الطعام
+    const imageUrl = req.file.path; // مسار الصورة، تأكد من أنه صالح
+    const publicId = req.file.filename; // يجب أن يكون لديك ملف فريد من نوعه
+    const {state, name, name_de, name_ar ,marka ,description ,description_de ,description_ar ,price ,year} = req.body;
+
+    // تأكد من وجود البيانات المطلوبة
+    if (!state || !name || !name_de || !name_ar || !marka || !description || !description_de || !description_ar  || !price || !year) {
+        return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
+
     const car = new carModel({
         state: req.body.state,
         name: req.body.name,
@@ -18,27 +34,20 @@ const addCar = async (req, res) => {
         description_ar: req.body.description_ar,
         price: req.body.price,
         year: req.body.year,
-        image: image_filename,
+        image: imageUrl,
     })
 
     try {
-        console.log("Received file:", req.file);
-        if (!req.file) {
-            return res.status(400).json({ error: "No image uploaded" });
-        }
-       
+        // حفظ الطعام في قاعدة البيانات
         await car.save();
-        res.json({ success: true, message: "Car Added" });
+        res.json({ success: true, message: "car added successfully" });
     } catch (error) {
-
-        res.json({ success: false, message: "Error" })
-
-
+        console.error("Error adding car:", error); // سجّل الخطأ لتتبعه
+        res.status(500).json({ success: false, message: "Error saving car", error: error.message });
     }
+};
 
 
-
-}
 // addExpense
 
 
@@ -265,19 +274,29 @@ const updateExpense = async (req, res) => {
 
 //update car item
 const updateCar = async (req, res) => {
-
+   
     try {
-        // البحث عن العنصر الحالي
-        const existingCar = await carModel.findById(req.params.id);
-        if (!existingCar) {
-            return res.status(404).json({ error: "Car not car" });
+          // البحث عن العنصر الحالي
+          const existingCat = await carModel.findById(req.params.id);
+          if (!existingCat) {
+              return res.status(404).json({ error: "car not found" });
+          }
+
+        let imageUrl = existingCat.image;
+        let imagePublicId = existingCat.image_public_id;
+
+        if (req.file) {
+            // حذف الصورة القديمة من Cloudinary
+            if (imagePublicId) {
+                await cloudinary.uploader.destroy(imagePublicId);
+            }
+
+            // تخزين الجديدة
+            imageUrl = req.file.path;
+            imagePublicId = req.file.filename;
         }
 
-        // التحقق من الصورة الجديدة أو الاحتفاظ بالصورة القديمة
-        const image_filename = req.file ? req.file.filename : existingCar.image;
-        console.log(req.body.name)
-        // تحديث البيانات
-        const updatedCar = await carModel.findByIdAndUpdate(
+        const updatedCat = await carModel.findByIdAndUpdate(
             req.params.id,
             {
                 state: req.body.state,
@@ -295,11 +314,13 @@ const updateCar = async (req, res) => {
             { new: true }
         );
 
-        res.json({ success: true, message: "Car updated successfully!", updatedCar });
+        res.json({ success: true, message: "car updated successfully!", updatedCat });
     } catch (error) {
         console.error("Update error:", error);
         res.status(500).json({ error: "Error updating car item" });
     }
 };
+
+
 
 export { addCar, listCar, removeCar, getOneCar, updateCar ,addExpense,getOneExpense,updateExpense,listExpense,removeExpense,getCarsByDate,getExpenseByDate,listExpenseCar}
