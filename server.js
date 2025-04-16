@@ -25,15 +25,10 @@ app.use(cors({
 app.use(express.urlencoded({ extended: true }));
 //db connection
 connectDB();
-// ✅ تمكين الوصول إلى مجلد الصور (اختياري)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // للسماح بعرض الصور مباشرة
 
 //api endpoints
 
 app.use("/api/car",carRouter)
-app.use("/images",express.static("uploads"))
 app.use("/api/user",userRouter);
 app.use("/api/cart",cartRouter);
 app.use("/api/sale",saleRouter);
