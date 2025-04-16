@@ -23,7 +23,6 @@ carRoute.post("/add", upload.single("image"), addCar);
   carRoute.post("/remove-expense",removeExpense)
   carRoute.get("/expense-by-date", getExpenseByDate);
   carRoute.get("/list-car-expense/:id", listExpenseCar);
-carRoute.use("/uploads",express.static("uploads"));
 
 
 

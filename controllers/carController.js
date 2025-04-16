@@ -35,6 +35,7 @@ console.log("–– FILE ––", req.file);
         price: req.body.price,
         year: req.body.year,
         image: imageUrl,
+        image_public_id: imagePublicId
     })
 
     try {
@@ -223,7 +224,7 @@ const removeExpense = async (req, res) => {
 const getOneCar = async (req, res) => {
     try {
         const car = await carModel.findById(req.params.id);
-        if (!car) return res.state(404).json({ error: "Car not found" });
+        if (!car) return res.status(404).json({ error: "Car not found" });
         res.json(car);
     } catch (error) {
         res.status(500).json({ error: "Error fetching car item" });
@@ -233,7 +234,7 @@ const getOneCar = async (req, res) => {
 const getOneExpense = async (req, res) => {
     try {
         const expense = await expenseModel.findById(req.params.id);
-        if (!expense) return res.state(404).json({ error: "expense not found" });
+        if (!expense) return res.status(404).json({ error: "expense not found" });
         res.json(expense);
     } catch (error) {
         res.status(500).json({ error: "Error fetching expense item" });
@@ -309,7 +310,8 @@ const updateCar = async (req, res) => {
                 description_ar: req.body.description_ar,
                 price: req.body.price,
                 year: req.body.year,
-                image: image_filename,
+                image: imageUrl,
+                image_public_id: imagePublicId
             },
             { new: true }
         );
