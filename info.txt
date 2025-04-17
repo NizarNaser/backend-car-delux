@@ -1,8 +1,0 @@
-git add .
-git commit -m "تحديثات جديدة"
-git push origin main
-//////////////
-https://dashboard.render.com/web/srv-cvuckbeuk2gs73897l30/deploys/dep-cvuckbmuk2gs73897l90
-https://backend-car-delux-1.onrender.com
-nizarnaser89@gmail.com
-pass NM
