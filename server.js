@@ -2,8 +2,6 @@ import express from "express"
 import cors from "cors"
 import { connectDB } from "./config/db.js"
 import carRouter from "./routes/carRoute.js"
-import path from "path";
-import { fileURLToPath } from "url";
 import userRouter from "./routes/userRoute.js";
 import "dotenv/config";
 import cartRouter from "./routes/cartRoute.js";
@@ -11,7 +9,7 @@ import saleRouter from "./routes/saleRoute.js";
 
 //app config
 const app =express()
-const port =3000
+const port = process.env.PORT
 
 //middeleware
 app.use(express.json())

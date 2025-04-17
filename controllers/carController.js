@@ -35,7 +35,7 @@ console.log("–– FILE ––", req.file);
         price: req.body.price,
         year: req.body.year,
         image: imageUrl,
-        image_public_id: imagePublicId
+        image_public_id: publicId
     })
 
     try {
