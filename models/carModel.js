@@ -11,17 +11,11 @@ const carSchema = new mongoose.Schema({
   description_ar: { type: String, required: true },
   price: { type: Number, required: true },
   year: { type: Number },
-
-  // ✅ دعم عدة صور
-  images: [
-    {
-      url: { type: String, required: true },
-      public_id: { type: String, required: true }
-    }
-  ]
+  image: { type: String},
+  image_public_id: { type: String} 
 }, { timestamps: true });
 
-// ➕ حقل افتراضي لتاريخ الإنشاء بصيغة مبسطة
+// ➕ Add virtual field for formatted date
 carSchema.virtual("createdAtFormatted").get(function () {
   const date = this.createdAt;
   if (!date) return "";
@@ -31,7 +25,7 @@ carSchema.virtual("createdAtFormatted").get(function () {
   return `${yy}-${mm}-${dd}`;
 });
 
-// تفعيل إظهار الحقول الافتراضية في JSON
+// Enable virtuals in JSON output
 carSchema.set("toJSON", { virtuals: true });
 
 const carModel = mongoose.models.car || mongoose.model("car", carSchema);
