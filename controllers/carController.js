@@ -6,47 +6,46 @@ import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudi
 
 //add car item
 const addCar = async (req, res) => {
-    console.log("–– BODY ––", req.body);
-console.log("–– FILE ––", req.file);
-    // تحقق من وجود الصورة في الطلب
-    if (!req.file) {
-        return res.status(400).json({ success: false, message: "No image uploaded" });
+    console.log("–– FILES ––", req.files);
+  
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, message: "No images uploaded" });
     }
-
-    // معالجة بيانات الطعام
-    const imageUrl = req.file.path; // مسار الصورة، تأكد من أنه صالح
-    const publicId = req.file.filename; // يجب أن يكون لديك ملف فريد من نوعه
-    const {state, name, name_de, name_ar ,marka ,description ,description_de ,description_ar ,price ,year} = req.body;
-
-    // تأكد من وجود البيانات المطلوبة
-    if (!state || !name || !name_de || !name_ar || !marka || !description || !description_de || !description_ar  || !price || !year) {
-        return res.status(400).json({ success: false, message: "Missing required fields" });
+  
+    const images = req.files.map(file => ({
+      url: file.path,
+      public_id: file.filename
+    }));
+  
+    const { state, name, name_de, name_ar, marka, description, description_de, description_ar, price, year } = req.body;
+  
+    if (!state || !name || !name_de || !name_ar || !marka || !description || !description_de || !description_ar || !price || !year) {
+      return res.status(400).json({ success: false, message: "Missing required fields" });
     }
-
+  
     const car = new carModel({
-        state: req.body.state,
-        name: req.body.name,
-        name_de: req.body.name_de,
-        name_ar: req.body.name_ar,
-        marka: req.body.marka,
-        description: req.body.description,
-        description_de: req.body.description_de,
-        description_ar: req.body.description_ar,
-        price: req.body.price,
-        year: req.body.year,
-        image: imageUrl,
-        image_public_id: publicId
-    })
-
+      state,
+      name,
+      name_de,
+      name_ar,
+      marka,
+      description,
+      description_de,
+      description_ar,
+      price,
+      year,
+      image: images
+    });
+  
     try {
-        // حفظ الطعام في قاعدة البيانات
-        await car.save();
-        res.json({ success: true, message: "car added successfully" });
+      await car.save();
+      res.json({ success: true, message: "Car added successfully" });
     } catch (error) {
-        console.error("Error adding car:", error); // سجّل الخطأ لتتبعه
-        res.status(500).json({ success: false, message: "Error saving car", error: error.message });
+      console.error("Error adding car:", error);
+      res.status(500).json({ success: false, message: "Error saving car", error: error.message });
     }
-};
+  };
+  
 
 
 // addExpense
@@ -275,53 +274,53 @@ const updateExpense = async (req, res) => {
 
 //update car item
 const updateCar = async (req, res) => {
-   
     try {
-          // البحث عن العنصر الحالي
-          const existingCat = await carModel.findById(req.params.id);
-          if (!existingCat) {
-              return res.status(404).json({ error: "car not found" });
-          }
-
-        let imageUrl = existingCat.image;
-        let imagePublicId = existingCat.image_public_id;
-
-        if (req.file) {
-            // حذف الصورة القديمة من Cloudinary
-            if (imagePublicId) {
-                await cloudinary.uploader.destroy(imagePublicId);
-            }
-
-            // تخزين الجديدة
-            imageUrl = req.file.path;
-            imagePublicId = req.file.filename;
+      const existingCar = await carModel.findById(req.params.id);
+      if (!existingCar) {
+        return res.status(404).json({ error: "Car not found" });
+      }
+  
+      // حذف الصور القديمة من Cloudinary
+      if (req.files && req.files.length > 0 && existingCar.image) {
+        for (const img of existingCar.image) {
+          await cloudinary.uploader.destroy(img.public_id);
         }
-
-        const updatedCat = await carModel.findByIdAndUpdate(
-            req.params.id,
-            {
-                state: req.body.state,
-                name: req.body.name,
-                name_de: req.body.name_de,
-                name_ar: req.body.name_ar,
-                marka: req.body.marka,
-                description: req.body.description,
-                description_de: req.body.description_de,
-                description_ar: req.body.description_ar,
-                price: req.body.price,
-                year: req.body.year,
-                image: imageUrl,
-                image_public_id: imagePublicId
-            },
-            { new: true }
-        );
-
-        res.json({ success: true, message: "car updated successfully!", updatedCat });
+      }
+  
+      let newImages = existingCar.image;
+  
+      if (req.files && req.files.length > 0) {
+        newImages = req.files.map(file => ({
+          url: file.path,
+          public_id: file.filename
+        }));
+      }
+  
+      const updatedCar = await carModel.findByIdAndUpdate(
+        req.params.id,
+        {
+          state: req.body.state,
+          name: req.body.name,
+          name_de: req.body.name_de,
+          name_ar: req.body.name_ar,
+          marka: req.body.marka,
+          description: req.body.description,
+          description_de: req.body.description_de,
+          description_ar: req.body.description_ar,
+          price: req.body.price,
+          year: req.body.year,
+          image: newImages
+        },
+        { new: true }
+      );
+  
+      res.json({ success: true, message: "Car updated successfully!", updatedCar });
     } catch (error) {
-        console.error("Update error:", error);
-        res.status(500).json({ error: "Error updating car item" });
+      console.error("Update error:", error);
+      res.status(500).json({ error: "Error updating car item" });
     }
-};
+  };
+  
 
 
 

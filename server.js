@@ -15,7 +15,7 @@ const port = process.env.PORT
 app.use(express.json())
 // ✅ السماح فقط لموقع GitHub Pages
 app.use(cors({
-    origin: "https://nizarnaser.github.io",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
@@ -42,5 +42,3 @@ app.listen(port,()=>{
     
 })
 
-
-//mongodb+srv://nizarnaser17:Nizar_1970@cluster0.dlcal.mongodb.net/?
