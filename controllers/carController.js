@@ -280,7 +280,7 @@ const updateCar = async (req, res) => {
         return res.status(404).json({ error: "Car not found" });
       }
   
-      // حذف الصور القديمة من Cloudinary
+      // حذف الصور القديمة من Cloudinary إذا تم رفع صور جديدة
       if (req.files && req.files.length > 0 && existingCar.image) {
         for (const img of existingCar.image) {
           await cloudinary.uploader.destroy(img.public_id);
@@ -290,9 +290,18 @@ const updateCar = async (req, res) => {
       let newImages = existingCar.image;
   
       if (req.files && req.files.length > 0) {
-        newImages = req.files.map(file => ({
-          url: file.path,
-          public_id: file.filename
+        // رفع الصور إلى Cloudinary
+        const uploads = await Promise.all(
+          req.files.map(file =>
+            cloudinary.uploader.upload(file.path, {
+              folder: "car_images"
+            })
+          )
+        );
+  
+        newImages = uploads.map(img => ({
+          url: img.secure_url,
+          public_id: img.public_id
         }));
       }
   
@@ -320,6 +329,7 @@ const updateCar = async (req, res) => {
       res.status(500).json({ error: "Error updating car item" });
     }
   };
+  
   
 
 
