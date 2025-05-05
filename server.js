@@ -15,10 +15,14 @@ const port = process.env.PORT
 app.use(express.json())
 // ✅ السماح فقط لموقع GitHub Pages
 app.use(cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   }));
 app.use(express.urlencoded({ extended: true }));
 //db connection
