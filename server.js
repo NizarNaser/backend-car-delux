@@ -14,6 +14,10 @@ const port = process.env.PORT
 //middeleware
 app.use(express.json())
 // ✅ السماح فقط لموقع GitHub Pages
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://deluxe-auto-one.vercel.app"
+  ];
 app.use(cors({
     origin: function (origin, callback) {
       if (!origin || allowedOrigins.includes(origin)) {
