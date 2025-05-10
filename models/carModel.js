@@ -6,8 +6,8 @@ const carSchema = new mongoose.Schema({
   description: { type: String, required: true },
   price: { type: Number, required: true },
   year: { type: Number },
-  images:[{ type: String }], // لتخزين روابط الصور
-  image_public_ids: { type: [String] } // لتخزين public_ids الخاصة بالصور
+  image: { type: String},
+  image_public_id: { type: String} 
 }, { timestamps: true });
 
 // ➕ Add virtual field for formatted date
