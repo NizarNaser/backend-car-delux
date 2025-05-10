@@ -1,10 +1,12 @@
 import carModel from "../models/carModel.js";
 import expenseModel from "../models/expenseModel.js";
-import fs from "fs";
+import fs from "fs"
 import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudinary
 
+
+//add car item
 // إضافة سيارة
- const addCar = async (req, res) => {
+const addCar = async (req, res) => {
     try {
       const { state, name, description, price, year } = req.body;
   
@@ -31,80 +33,263 @@ import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudi
       res.status(500).json({ success: false, message: "فشل في الإضافة", error: error.message });
     }
   };
-  
-// إزالة السيارة
-const removeCar = async (req, res) => {
-    try {
-        const car = await carModel.findById(req.body.id);
 
-        // حذف الصور من Cloudinary
-        for (let publicId of car.image_public_ids) {
-            await cloudinary.uploader.destroy(publicId);
+// addExpense
+
+
+const addExpense = async (req, res) => {
+    try {
+        const {
+            car_id,
+            state,
+            name,
+            description,
+            price
+        } = req.body;
+
+        if (
+            !state || !name || !name_de || !name_ar ||
+            !description || !description_de || !description_ar || !price
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields except car_id are required"
+            });
         }
 
-        // حذف السيارة من قاعدة البيانات
-        await carModel.findByIdAndDelete(req.body.id);
-        res.json({ success: true, message: "Car Removed" });
+        const newExpense = new expenseModel({
+            car_id, // هذا السطر سيكون الآن داخل الدالة وبالتالي لا خطأ
+            state,
+            name,
+            description,
+            price: Number(price)
+        });
+
+        await newExpense.save();
+
+        res.status(201).json({
+            success: true,
+            message: "Expense added successfully",
+            data: newExpense
+        });
 
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: "Error" });
+        console.error("Error in addExpense:", error);
+        res.status(500).json({ success: false, message: "Server error" });
     }
 };
 
-// تعديل بيانات السيارة
-const updateCar = async (req, res) => {
+
+// دالة للحصول على السيارات ضمن فترة زمنية محددة
+ const getCarsByDate = async (req, res) => {
+    try {
+      const { start, end ,state} = req.query;
+  
+      // التحقق من وجود التاريخين
+      if (!start || !end || !state) {
+        return res.status(400).json({ message: "يرجى تحديد تاريخ البداية والنهاية والحالة (state)" });
+      }
+  
+      // جلب السيارات التي تم إنشاؤها بين التاريخين
+      const cars = await carModel.find({
+        createdAt: {
+          $gte: new Date(start),
+          $lte: new Date(end),
+        },
+        state: state
+      }).sort({ createdAt: -1 }); // ترتيب تنازلي حسب الأحدث
+  
+      res.json(cars);
+    } catch (err) {
+      res.status(500).json({ message: "حدث خطأ أثناء جلب البيانات", error: err.message });
+    }
+  };
+
+  
+//all car list
+const listCar = async (req, res) => {
+    try {
+        const cars = await carModel.find({});
+        res.json({ success: true, data: cars });
+
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error" })
+
+    }
+}
+//listExpense
+const listExpense = async (req, res) => {
+    try {
+        const Expenses = await expenseModel.find({});
+        res.json({ success: true, data: Expenses });
+
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error" })
+
+    }
+}
+//listExpense from id car
+const listExpenseCar = async (req, res) => {
+    try {
+      const Expenses = await expenseModel.find({ car_id: req.params.id });
+      res.json({ success: true, data: Expenses });
+    } catch (error) {
+      console.log(error);
+      res.json({ success: false, message: "Error" });
+    }
+  };
+
+// دالة للحصول على مشتريات أخرى ضمن فترة زمنية محددة
+const getExpenseByDate = async (req, res) => {
+    try {
+      const { start, end, state } = req.query;
+  
+      // التحقق من وجود التاريخين وحالة الستات
+      if (!start || !end || !state) {
+        return res.status(400).json({ message: "يرجى تحديد تاريخ البداية والنهاية والحالة (state)" });
+      }
+  
+      // جلب المشتريات الأخرى التي تم إنشاؤها بين التاريخين وبالحالة المطلوبة
+      const expense = await expenseModel.find({
+        createdAt: {
+          $gte: new Date(start),
+          $lte: new Date(end)
+        },
+        state: state
+      }).sort({ createdAt: -1 }); // ترتيب تنازلي حسب الأحدث
+  
+      res.json(expense);
+    } catch (err) {
+      res.status(500).json({ message: "حدث خطأ أثناء جلب البيانات", error: err.message });
+    }
+  };
+  
+
+
+//remove car item
+const removeCar = async (req, res) => {
+    try {
+        const car = await carModel.findById(req.body.id);
+        fs.unlink(`uploads/${car.image}`, () => { })
+
+        await carModel.findByIdAndDelete(req.body.id);
+        res.json({ success: true, message: "car Removed" });
+
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error" })
+    }
+}
+//removeExpense
+const removeExpense = async (req, res) => {
+    try {
+        const expense = await expenseModel.findById(req.body.id);
+
+
+        await expenseModel.findByIdAndDelete(req.body.id);
+        res.json({ success: true, message: "expense Removed" });
+
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error" })
+    }
+}
+
+//one car item
+const getOneCar = async (req, res) => {
+    try {
+        const car = await carModel.findById(req.params.id);
+        if (!car) return res.status(404).json({ error: "Car not found" });
+        res.json(car);
+    } catch (error) {
+        res.status(500).json({ error: "Error fetching car item" });
+    }
+}
+//getOneExpense
+const getOneExpense = async (req, res) => {
+    try {
+        const expense = await expenseModel.findById(req.params.id);
+        if (!expense) return res.status(404).json({ error: "expense not found" });
+        res.json(expense);
+    } catch (error) {
+        res.status(500).json({ error: "Error fetching expense item" });
+    }
+}
+//updateExpense
+const updateExpense = async (req, res) => {
+
     try {
         // البحث عن العنصر الحالي
-        const existingCar = await carModel.findById(req.params.id);
-        if (!existingCar) {
-            return res.status(404).json({ error: "Car not found" });
+        const existingExpense = await expenseModel.findById(req.params.id);
+        if (!existingExpense) {
+            return res.status(404).json({ error: "Expense not found" });
         }
+        // تحديث البيانات
+        const updatedExpense = await expenseModel.findByIdAndUpdate(
+            req.params.id,
+            {   
+                car_id: req.body.car_id,
+                state: req.body.state,
+                name: req.body.name,
+                description: req.body.description,
+                price: req.body.price,
+            },
+            { new: true }
+        );
 
-        let imageUrls = existingCar.images;
-        let imagePublicIds = existingCar.image_public_ids;
+        res.json({ success: true, message: "Expense updated successfully!", updatedExpense });
+    } catch (error) {
+        console.error("Update error:", error);
+        res.status(500).json({ error: "Error updating Expense item" });
+    }
+};
 
-        if (req.files && req.files.length > 0) {
-            // حذف الصور القديمة من Cloudinary
-            for (let publicId of imagePublicIds) {
-                await cloudinary.uploader.destroy(publicId);
+//update car item
+const updateCar = async (req, res) => {
+   
+    try {
+          // البحث عن العنصر الحالي
+          const existingCat = await carModel.findById(req.params.id);
+          if (!existingCat) {
+              return res.status(404).json({ error: "car not found" });
+          }
+
+        let imageUrl = existingCat.image;
+        let imagePublicId = existingCat.image_public_id;
+
+        if (req.file) {
+            // حذف الصورة القديمة من Cloudinary
+            if (imagePublicId) {
+                await cloudinary.uploader.destroy(imagePublicId);
             }
 
-            // تخزين الصور الجديدة
-            imageUrls = [];
-            imagePublicIds = [];
-
-            for (let file of req.files) {
-                try {
-                    const uploadResult = await cloudinary.uploader.upload(file.path); // رفع الصورة
-                    imageUrls.push(uploadResult.secure_url); // تخزين رابط الصورة
-                    imagePublicIds.push(uploadResult.public_id); // تخزين public_id
-                } catch (error) {
-                    return res.status(500).json({ success: false, message: "Error uploading images", error: error.message });
-                }
-            }
+            // تخزين الجديدة
+            imageUrl = req.file.path;
+            imagePublicId = req.file.filename;
         }
 
-        // تحديث بيانات السيارة
-        const updatedCar = await carModel.findByIdAndUpdate(
+        const updatedCat = await carModel.findByIdAndUpdate(
             req.params.id,
             {
                 state: req.body.state,
                 name: req.body.name,
                 description: req.body.description,
                 price: req.body.price,
-                year: req.body.year,
-                images: imageUrls,
-                image_public_ids: imagePublicIds
+                image: imageUrl,
+                image_public_id: imagePublicId
             },
             { new: true }
         );
 
-        res.json({ success: true, message: "Car updated successfully!", updatedCar });
+        res.json({ success: true, message: "car updated successfully!", updatedCat });
     } catch (error) {
         console.error("Update error:", error);
         res.status(500).json({ error: "Error updating car item" });
     }
 };
 
-export { addCar, removeCar, updateCar };
+
+
+export { addCar, listCar, removeCar, getOneCar, updateCar ,addExpense,getOneExpense,updateExpense,listExpense,removeExpense,getCarsByDate,getExpenseByDate,listExpenseCar}
