@@ -247,48 +247,50 @@ const updateExpense = async (req, res) => {
 };
 
 //update car item
+// 🛠 تحديث سيارة وصورها
 const updateCar = async (req, res) => {
-   
     try {
-          // البحث عن العنصر الحالي
-          const existingCat = await carModel.findById(req.params.id);
-          if (!existingCat) {
-              return res.status(404).json({ error: "car not found" });
-          }
-
-        let imageUrl = existingCat.image;
-        let imagePublicId = existingCat.image_public_id;
-
-        if (req.file) {
-            // حذف الصورة القديمة من Cloudinary
-            if (imagePublicId) {
-                await cloudinary.uploader.destroy(imagePublicId);
-            }
-
-            // تخزين الجديدة
-            imageUrl = req.file.path;
-            imagePublicId = req.file.filename;
+      const { id } = req.params;
+      const car = await carModel.findById(id);
+      if (!car) return res.status(404).json({ success: false, message: "السيارة غير موجودة" });
+  
+      const { state, name, description, price, year } = req.body;
+  
+      // حذف الصور القديمة من Cloudinary إذا تم رفع صور جديدة
+      if (req.files && req.files.length > 0 && car.images && car.images.length > 0) {
+        for (const img of car.images) {
+          await cloudinary.uploader.destroy(img.public_id);
         }
-
-        const updatedCat = await carModel.findByIdAndUpdate(
-            req.params.id,
-            {
-                state: req.body.state,
-                name: req.body.name,
-                description: req.body.description,
-                price: req.body.price,
-                image: imageUrl,
-                image_public_id: imagePublicId
-            },
-            { new: true }
-        );
-
-        res.json({ success: true, message: "car updated successfully!", updatedCat });
+      }
+  
+      // رفع الصور الجديدة
+      let updatedImages = car.images;
+      if (req.files && req.files.length > 0) {
+        updatedImages = [];
+        for (const file of req.files) {
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder: "cars"
+          });
+          updatedImages.push({
+            url: result.secure_url,
+            public_id: result.public_id
+          });
+        }
+      }
+  
+      car.state = state || car.state;
+      car.name = name || car.name;
+      car.description = description || car.description;
+      car.price = price || car.price;
+      car.year = year || car.year;
+      car.images = updatedImages;
+  
+      await car.save();
+      res.json({ success: true, message: "تم التحديث", data: car });
     } catch (error) {
-        console.error("Update error:", error);
-        res.status(500).json({ error: "Error updating car item" });
+      res.status(500).json({ success: false, message: "فشل في التحديث", error });
     }
-};
+  };
 
 
 
