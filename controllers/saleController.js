@@ -9,17 +9,12 @@ const addSale = async (req, res) => {
             car_id,
             state,
             name,
-            name_de,
-            name_ar,
             description,
-            description_de,
-            description_ar,
             price
         } = req.body;
 
         if (
-           !state || !name || !name_de || !name_ar ||
-            !description || !description_de || !description_ar || !price
+           !state || !name || !description || !price
         ) {
             return res.status(400).json({
                 success: false,
@@ -31,11 +26,7 @@ const addSale = async (req, res) => {
             car_id, // هذا السطر سيكون الآن داخل الدالة وبالتالي لا خطأ
             state,
             name,
-            name_de,
-            name_ar,
             description,
-            description_de,
-            description_ar,
             price: Number(price)
         });
 
@@ -131,11 +122,7 @@ const updateSale = async (req, res) => {
                 car_id: req.body.car_id,
                 state: req.body.state,
                 name: req.body.name,
-                name_de: req.body.name_de,
-                name_ar: req.body.name_ar,
                 description: req.body.description,
-                description_de: req.body.description_de,
-                description_ar: req.body.description_ar,
                 price: req.body.price,
             },
             { new: true }

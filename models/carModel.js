@@ -3,12 +3,7 @@ import mongoose from "mongoose";
 const carSchema = new mongoose.Schema({
   state: { type: String, required: true },
   name: { type: String, required: true },
-  name_de: { type: String, required: true },
-  name_ar: { type: String, required: true },
-  marka: { type: String, required: true },
   description: { type: String, required: true },
-  description_de: { type: String, required: true },
-  description_ar: { type: String, required: true },
   price: { type: Number, required: true },
   year: { type: Number },
   image: { type: String},

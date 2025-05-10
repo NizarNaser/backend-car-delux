@@ -5,11 +5,7 @@ const expenseSchema = new mongoose.Schema({
   car_id: { type: String, required: false },
   state: { type: String, required: true },
   name: { type: String, required: true },
-  name_de: { type: String, required: true },
-  name_ar: { type: String, required: true },
   description: { type: String, required: true },
-  description_de: { type: String, required: true },
-  description_ar: { type: String, required: true },
   price: { type: Number, required: true }
 }, { 
   timestamps: true // ➕ createdAt و updatedAt تلقائيًا

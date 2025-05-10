@@ -16,22 +16,17 @@ console.log("–– FILE ––", req.file);
     // معالجة بيانات الطعام
     const imageUrl = req.file.path; // مسار الصورة، تأكد من أنه صالح
     const publicId = req.file.filename; // يجب أن يكون لديك ملف فريد من نوعه
-    const {state, name, name_de, name_ar ,marka ,description ,description_de ,description_ar ,price ,year} = req.body;
+    const {state, name,description,price ,year} = req.body;
 
     // تأكد من وجود البيانات المطلوبة
-    if (!state || !name || !name_de || !name_ar || !marka || !description || !description_de || !description_ar  || !price || !year) {
+    if (!state || !name || !description || !price || !year) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
 
     const car = new carModel({
         state: req.body.state,
         name: req.body.name,
-        name_de: req.body.name_de,
-        name_ar: req.body.name_ar,
-        marka: req.body.marka,
         description: req.body.description,
-        description_de: req.body.description_de,
-        description_ar: req.body.description_ar,
         price: req.body.price,
         year: req.body.year,
         image: imageUrl,
@@ -58,11 +53,7 @@ const addExpense = async (req, res) => {
             car_id,
             state,
             name,
-            name_de,
-            name_ar,
             description,
-            description_de,
-            description_ar,
             price
         } = req.body;
 
@@ -80,11 +71,7 @@ const addExpense = async (req, res) => {
             car_id, // هذا السطر سيكون الآن داخل الدالة وبالتالي لا خطأ
             state,
             name,
-            name_de,
-            name_ar,
             description,
-            description_de,
-            description_ar,
             price: Number(price)
         });
 
@@ -256,11 +243,7 @@ const updateExpense = async (req, res) => {
                 car_id: req.body.car_id,
                 state: req.body.state,
                 name: req.body.name,
-                name_de: req.body.name_de,
-                name_ar: req.body.name_ar,
                 description: req.body.description,
-                description_de: req.body.description_de,
-                description_ar: req.body.description_ar,
                 price: req.body.price,
             },
             { new: true }
@@ -302,14 +285,8 @@ const updateCar = async (req, res) => {
             {
                 state: req.body.state,
                 name: req.body.name,
-                name_de: req.body.name_de,
-                name_ar: req.body.name_ar,
-                marka: req.body.marka,
                 description: req.body.description,
-                description_de: req.body.description_de,
-                description_ar: req.body.description_ar,
                 price: req.body.price,
-                year: req.body.year,
                 image: imageUrl,
                 image_public_id: imagePublicId
             },
