@@ -4,7 +4,7 @@ import fs from "fs";
 import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudinary
 
 // إضافة سيارة
-export const addCar = async (req, res) => {
+ const addCar = async (req, res) => {
     try {
       const { state, name, description, price, year } = req.body;
   
