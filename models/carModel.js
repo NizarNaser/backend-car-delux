@@ -6,8 +6,9 @@ const carSchema = new mongoose.Schema({
   description: { type: String, required: true },
   price: { type: Number, required: true },
   year: { type: Number },
-  image: { type: String},
-  image_public_id: { type: String} 
+  images: [{ type: String }], // ✨ array of image URLs
+  image_public_ids: [{ type: String }] // ✨ array of public_ids
+
 }, { timestamps: true });
 
 // ➕ Add virtual field for formatted date
