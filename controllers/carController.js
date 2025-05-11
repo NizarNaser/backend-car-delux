@@ -262,7 +262,6 @@ const updateExpense = async (req, res) => {
 // 🛠 تحديث سيارة وصورها
 // controllers/carController.js
 
-const Car = require("../models/carModel");
 
 const updateCar = async (req, res) => {
   try {
@@ -288,7 +287,7 @@ const updateCar = async (req, res) => {
     const updatedImages = [...existingImages, ...newImages];
 
     // 4. تحديث بيانات السيارة
-    const updatedCar = await Car.findByIdAndUpdate(
+    const updatedCar = await carModel.findByIdAndUpdate(
       req.params.id,
       {
         name,
