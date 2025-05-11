@@ -264,47 +264,43 @@ const updateExpense = async (req, res) => {
 
 
 const updateCar = async (req, res) => {
-  try {
-    const { name, description, price, year } = req.body;
-
-    // 1. معالجة الصور القديمة
-    let existingImages = [];
-    if (req.body.existingImages) {
-      if (typeof req.body.existingImages === "string") {
-        existingImages = [JSON.parse(req.body.existingImages)];
-      } else {
-        existingImages = req.body.existingImages.map(img => JSON.parse(img));
+    try {
+      const { name, description, price, year } = req.body;
+  
+      let existingImages = [];
+      if (req.body.existingImages) {
+        if (typeof req.body.existingImages === "string") {
+          existingImages = [JSON.parse(req.body.existingImages)];
+        } else {
+          existingImages = req.body.existingImages.map(img => JSON.parse(img));
+        }
       }
+  
+      const newImages = req.files.map(file => ({
+        url: file.path,
+        public_id: file.filename,
+      }));
+  
+      const updatedImages = [...existingImages, ...newImages];
+  
+      const updatedCar = await carModel.findByIdAndUpdate(
+        req.params.id,
+        {
+          name,
+          description,
+          price,
+          year,
+          images: updatedImages,
+        },
+        { new: true }
+      );
+  
+      res.status(200).json({ success: true, data: updatedCar });
+    } catch (error) {
+      console.error("Error updating car:", error);
+      res.status(500).json({ success: false, message: "Fehler beim Aktualisieren" });
     }
-
-    // 2. معالجة الصور الجديدة المرفوعة
-    const newImages = req.files.map(file => ({
-      url: file.path,
-      public_id: file.filename,
-    }));
-
-    // 3. دمج الصور القديمة والجديدة
-    const updatedImages = [...existingImages, ...newImages];
-
-    // 4. تحديث بيانات السيارة
-    const updatedCar = await carModel.findByIdAndUpdate(
-      req.params.id,
-      {
-        name,
-        description,
-        price,
-        year,
-        images: updatedImages,
-      },
-      { new: true }
-    );
-
-    res.status(200).json({ success: true, data: updatedCar });
-  } catch (error) {
-    console.error("Error updating car:", error);
-    res.status(500).json({ success: false, message: "Fehler beim Aktualisieren" });
-  }
-};
+  };
 
 
 
