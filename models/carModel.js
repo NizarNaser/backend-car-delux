@@ -6,8 +6,12 @@ const carSchema = new mongoose.Schema({
   description: { type: String, required: true },
   price: { type: Number, required: true },
   year: { type: Number },
-  images: [{ type: String }], // ✨ array of image URLs
-  image_public_ids: [{ type: String }] // ✨ array of public_ids
+  images: [
+    {
+      url: String,
+      public_id: String
+    }
+  ]
 
 }, { timestamps: true });
 

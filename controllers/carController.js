@@ -5,7 +5,8 @@ import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudi
 
 
 //add car item
- const addCar = async (req, res) => {
+// ✅ تحديث دالة addCar
+const addCar = async (req, res) => {
     try {
       const { state, name, description, price, year } = req.body;
   
@@ -13,8 +14,18 @@ import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudi
         return res.status(400).json({ success: false, message: "يجب تحميل صور." });
       }
   
-      const imageUrls = req.files.map(file => file.path);
-      const imagePublicIds = req.files.map(file => file.filename); // public_id في Cloudinary
+      const imageUploadResults = [];
+  
+      for (const file of req.files) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: "cars"
+        });
+  
+        imageUploadResults.push({
+          url: result.secure_url,
+          public_id: result.public_id
+        });
+      }
   
       const newCar = new carModel({
         state,
@@ -22,16 +33,18 @@ import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudi
         description,
         price,
         year,
-        images: imageUrls, // ✨ مصفوفة روابط الصور
-        image_public_ids: imagePublicIds // ✨ مصفوفة public_id
+        images: imageUploadResults
       });
   
       await newCar.save();
+  
       res.status(201).json({ success: true, message: "تمت إضافة السيارة بنجاح", car: newCar });
+  
     } catch (error) {
       res.status(500).json({ success: false, message: "فشل في الإضافة", error: error.message });
     }
   };
+  
   
 
 // addExpense
