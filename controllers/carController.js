@@ -260,49 +260,56 @@ const updateExpense = async (req, res) => {
 };
 
 // 🛠 تحديث سيارة وصورها
+// controllers/carController.js
+
+const Car = require("../models/carModel");
+const cloudinary = require("cloudinary").v2;
+
 const updateCar = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const car = await carModel.findById(id);
-      if (!car) return res.status(404).json({ success: false, message: "السيارة غير موجودة" });
-  
-      const { state, name, description, price, year } = req.body;
-  
-      // حذف الصور القديمة من Cloudinary إذا تم رفع صور جديدة
-      if (req.files && req.files.length > 0 && car.images && car.images.length > 0) {
-        for (const img of car.images) {
-          await cloudinary.uploader.destroy(img.public_id);
-        }
+  try {
+    const { name, description, price, year } = req.body;
+
+    // 1. معالجة الصور القديمة
+    let existingImages = [];
+    if (req.body.existingImages) {
+      if (typeof req.body.existingImages === "string") {
+        existingImages = [JSON.parse(req.body.existingImages)];
+      } else {
+        existingImages = req.body.existingImages.map(img => JSON.parse(img));
       }
-  
-      // رفع الصور الجديدة
-      let updatedImages = car.images;
-      if (req.files && req.files.length > 0) {
-        updatedImages = [];
-        for (const file of req.files) {
-          const result = await cloudinary.uploader.upload(file.path, {
-            folder: "cars"
-          });
-          updatedImages.push({
-            url: result.secure_url,
-            public_id: result.public_id
-          });
-        }
-      }
-  
-      car.state = state || car.state;
-      car.name = name || car.name;
-      car.description = description || car.description;
-      car.price = price || car.price;
-      car.year = year || car.year;
-      car.images = updatedImages;
-  
-      await car.save();
-      res.json({ success: true, message: "تم التحديث", data: car });
-    } catch (error) {
-      res.status(500).json({ success: false, message: "فشل في التحديث", error });
     }
-  };
+
+    // 2. معالجة الصور الجديدة المرفوعة
+    const newImages = req.files.map(file => ({
+      url: file.path,
+      public_id: file.filename,
+    }));
+
+    // 3. دمج الصور القديمة والجديدة
+    const updatedImages = [...existingImages, ...newImages];
+
+    // 4. تحديث بيانات السيارة
+    const updatedCar = await Car.findByIdAndUpdate(
+      req.params.id,
+      {
+        name,
+        description,
+        price,
+        year,
+        images: updatedImages,
+      },
+      { new: true }
+    );
+
+    res.status(200).json({ success: true, data: updatedCar });
+  } catch (error) {
+    console.error("Error updating car:", error);
+    res.status(500).json({ success: false, message: "Fehler beim Aktualisieren" });
+  }
+};
+
+module.exports = { updateCar };
+
 
 
 
