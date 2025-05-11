@@ -263,7 +263,6 @@ const updateExpense = async (req, res) => {
 // controllers/carController.js
 
 const Car = require("../models/carModel");
-const cloudinary = require("cloudinary").v2;
 
 const updateCar = async (req, res) => {
   try {
