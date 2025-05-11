@@ -1,4 +1,3 @@
-// config/cloudinary.js
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
@@ -11,9 +10,12 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: 'cars-images', // اسم مجلد الصور في Cloudinary
-    allowed_formats: ['jpg', 'png', 'jpeg', "webp"],
-    transformation: [{ width: 800, crop: "limit" }],
+    folder: 'restaurant-images',
+    allowed_formats: ['webp', 'jpg', 'png'], // السماح بالعديد من الصيغ
+    transformation: [
+      { width: 300, crop: 'limit' },
+      { quality: 'auto' },         // ضبط الجودة تلقائيًا
+    ],
   },
 });
 
