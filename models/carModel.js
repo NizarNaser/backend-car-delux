@@ -1,18 +1,17 @@
 import mongoose from "mongoose";
 
+const imageSchema = new mongoose.Schema({
+  url: { type: String, required: true },
+  public_id: { type: String, required: true }
+}, { _id: false });
+
 const carSchema = new mongoose.Schema({
   state: { type: String, required: true },
   name: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },
   year: { type: Number },
-  images: [
-    {
-      url: String,
-      public_id: String
-    }
-  ]
-
+  images: [imageSchema]
 }, { timestamps: true });
 
 // ➕ Add virtual field for formatted date
@@ -25,8 +24,9 @@ carSchema.virtual("createdAtFormatted").get(function () {
   return `${yy}-${mm}-${dd}`;
 });
 
-// Enable virtuals in JSON output
+// Enable virtuals in JSON and Object output
 carSchema.set("toJSON", { virtuals: true });
+carSchema.set("toObject", { virtuals: true });
 
 const carModel = mongoose.models.car || mongoose.model("car", carSchema);
 export default carModel;
