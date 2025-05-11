@@ -5,7 +5,7 @@ import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudi
 
 
 //add car item
-export const addCar = async (req, res) => {
+ const addCar = async (req, res) => {
     try {
       const { state, name, description, price, year } = req.body;
   
