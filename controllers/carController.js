@@ -267,6 +267,7 @@ const updateCar = async (req, res) => {
     try {
       const { name, description, price, year } = req.body;
   
+      // الصور الحالية من الـ frontend
       let existingImages = [];
       if (req.body.existingImages) {
         if (typeof req.body.existingImages === "string") {
@@ -276,42 +277,52 @@ const updateCar = async (req, res) => {
         }
       }
   
+      // ✅ جلب السيارة الأصلية من قاعدة البيانات
+      const car = await carModel.findById(req.params.id);
+      if (!car) return res.status(404).json({ message: "السيارة غير موجودة" });
+  
+      // ✅ تحديد الصور التي يجب حذفها من Cloudinary
+      const imagesToDelete = car.images.filter(oldImg => {
+        return !existingImages.some(img => img.public_id === oldImg.public_id);
+      });
+  
+      // ✅ حذف الصور من Cloudinary
+      for (const img of imagesToDelete) {
+        await cloudinary.uploader.destroy(img.public_id);
+      }
+  
+      // ✅ رفع الصور الجديدة (إن وجدت)
       const newImages = [];
-
       if (req.files && req.files.length > 0) {
         for (const file of req.files) {
           const result = await cloudinary.uploader.upload(file.path, {
             folder: "cars"
           });
-      
           newImages.push({
             url: result.secure_url,
             public_id: result.public_id
           });
         }
       }
-      
   
+      // ✅ تحديث الصور
       const updatedImages = [...existingImages, ...newImages];
   
+      // ✅ تحديث السيارة
       const updatedCar = await carModel.findByIdAndUpdate(
         req.params.id,
-        {
-          name,
-          description,
-          price,
-          year,
-          images: updatedImages,
-        },
+        { name, description, price, year, images: updatedImages },
         { new: true }
       );
   
       res.status(200).json({ success: true, data: updatedCar });
+  
     } catch (error) {
       console.error("Error updating car:", error);
-      res.status(500).json({ success: false, message: "Fehler beim Aktualisieren" });
+      res.status(500).json({ success: false, message: "حدث خطأ أثناء التحديث" });
     }
   };
+  
 
 
 
