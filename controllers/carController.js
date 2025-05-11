@@ -306,9 +306,6 @@ const updateCar = async (req, res) => {
   }
 };
 
-module.exports = { updateCar };
-
-
 
 
 export { addCar, listCar, removeCar, getOneCar, updateCar ,addExpense,getOneExpense,updateExpense,listExpense,removeExpense,getCarsByDate,getExpenseByDate,listExpenseCar}
