@@ -276,10 +276,21 @@ const updateCar = async (req, res) => {
         }
       }
   
-      const newImages = req.files.map(file => ({
-        url: file.path,
-        public_id: file.filename,
-      }));
+      const newImages = [];
+
+      if (req.files && req.files.length > 0) {
+        for (const file of req.files) {
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder: "cars"
+          });
+      
+          newImages.push({
+            url: result.secure_url,
+            public_id: result.public_id
+          });
+        }
+      }
+      
   
       const updatedImages = [...existingImages, ...newImages];
   
