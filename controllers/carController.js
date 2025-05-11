@@ -30,48 +30,63 @@ const addCar = async (req, res) => {
 // 🔄 تحديث سيارة وصورها
 const updateCar = async (req, res) => {
     try {
-        const { name, description, price, year } = req.body;
-        let existingImages = [];
-        if (req.body.existingImages) {
-            if (typeof req.body.existingImages === "string") {
-                existingImages = [JSON.parse(req.body.existingImages)];
-            } else {
-                existingImages = req.body.existingImages.map(img => JSON.parse(img));
-            }
+      const { name, description, price, year, state } = req.body;
+  
+      // 1. قراءة الصور القديمة المتبقية
+      let existingImages = [];
+      if (req.body.existingImages) {
+        if (typeof req.body.existingImages === "string") {
+          existingImages = [JSON.parse(req.body.existingImages)];
+        } else {
+          existingImages = req.body.existingImages.map(img => JSON.parse(img));
         }
-
-        const car = await carModel.findById(req.params.id);
-        if (!car) return res.status(404).json({ message: "السيارة غير موجودة" });
-
-        const imagesToDelete = car.images.filter(oldImg =>
-            !existingImages.some(img => img.public_id === oldImg.public_id)
-        );
-        for (const img of imagesToDelete) {
-            await cloudinary.uploader.destroy(img.public_id);
+      }
+  
+      // 2. حذف الصور المحددة من الواجهة
+      let deletedImages = [];
+      if (req.body.deletedImages) {
+        deletedImages = Array.isArray(req.body.deletedImages)
+          ? req.body.deletedImages
+          : [req.body.deletedImages];
+  
+        for (const public_id of deletedImages) {
+          await cloudinary.uploader.destroy(public_id);
         }
-
-        const newImages = [];
-        if (req.files && req.files.length > 0) {
-            for (const file of req.files) {
-                const result = await cloudinary.uploader.upload(file.path, { folder: "cars" });
-                newImages.push({ url: result.secure_url, public_id: result.public_id });
-            }
+      }
+  
+      // 3. رفع الصور الجديدة
+      const newImages = [];
+      if (req.files && req.files.length > 0) {
+        for (const file of req.files) {
+          const result = await cloudinary.uploader.upload(file.path, { folder: "cars" });
+          newImages.push({ url: result.secure_url, public_id: result.public_id });
         }
-
-        const updatedImages = [...existingImages, ...newImages];
-
-        const updatedCar = await carModel.findByIdAndUpdate(
-            req.params.id,
-            { name, description, price, year, images: updatedImages },
-            { new: true }
-        );
-
-        res.status(200).json({ success: true, data: updatedCar });
+      }
+  
+      // 4. دمج الصور القديمة المتبقية + الجديدة
+      const updatedImages = [...existingImages, ...newImages];
+  
+      // 5. تحديث بيانات السيارة
+      const updatedCar = await carModel.findByIdAndUpdate(
+        req.params.id,
+        {
+          name,
+          description,
+          price,
+          year,
+          state,
+          images: updatedImages,
+        },
+        { new: true }
+      );
+  
+      res.status(200).json({ success: true, data: updatedCar });
     } catch (error) {
-        console.error("Error updating car:", error);
-        res.status(500).json({ success: false, message: "حدث خطأ أثناء التحديث" });
+      console.error("Error updating car:", error);
+      res.status(500).json({ success: false, message: "حدث خطأ أثناء التحديث" });
     }
-};
+  };
+  
 
 // 🗑️ حذف سيارة وصورها
 const removeCar = async (req, res) => {
