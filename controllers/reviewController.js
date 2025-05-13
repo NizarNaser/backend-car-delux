@@ -1,15 +1,25 @@
 import Review from '../models/Review.js';
 
 export const createReview = async (req, res) => {
-  try {
-    const { carId, user, rating, comment } = req.body;
-    const review = new Review({ carId, user, rating, comment });
-    await review.save();
-    res.status(201).json(review);
-  } catch (err) {
-    res.status(500).json({ message: 'Error adding review', error: err });
-  }
-};
+    try {
+      const { carId, rating, comment } = req.body;
+  
+      const review = new Review({
+        carId,
+        user: req.user.name,  // 👍 الاسم من التوكن
+        rating,
+        comment
+      });
+      
+  
+      await review.save();
+      res.status(201).json(review);
+    } catch (err) {
+      res.status(500).json({ message: 'Error adding review', error: err });
+    }
+  };
+  
+  
 
 export const getCarReviews = async (req, res) => {
   try {
