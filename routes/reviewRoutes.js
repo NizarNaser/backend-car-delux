@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { createReview, getCarReviews } = require('../controllers/reviewController');
+import { createReview, getCarReviews } from '../controllers/reviewController';
 
 router.post('/', createReview);
 router.get('/:carId', getCarReviews);
