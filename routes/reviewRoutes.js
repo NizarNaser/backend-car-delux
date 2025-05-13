@@ -5,4 +5,5 @@ const { createReview, getCarReviews } = require('../controllers/reviewController
 router.post('/', createReview);
 router.get('/:carId', getCarReviews);
 
-module.exports = router;
+
+export default router;
