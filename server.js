@@ -6,11 +6,12 @@ import userRouter from "./routes/userRoute.js";
 import "dotenv/config";
 import cartRouter from "./routes/cartRoute.js";
 import saleRouter from "./routes/saleRoute.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
+
 
 //app config
 const app =express()
 const port = process.env.PORT
-
 //middeleware
 app.use(express.json())
 // ✅ السماح فقط لموقع GitHub Pages
@@ -39,6 +40,7 @@ app.use("/api/car",carRouter)
 app.use("/api/user",userRouter);
 app.use("/api/cart",cartRouter);
 app.use("/api/sale",saleRouter);
+app.use('/api/reviews', reviewRoutes);
 app.get("/",(req,res)=>{
     res.send("API Working")
 
