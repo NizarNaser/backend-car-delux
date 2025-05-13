@@ -1,6 +1,6 @@
-const Review = require('../models/Review');
+import Review from '../models/Review.js';
 
-exports.createReview = async (req, res) => {
+export const createReview = async (req, res) => {
   try {
     const { carId, user, rating, comment } = req.body;
     const review = new Review({ carId, user, rating, comment });
@@ -11,7 +11,7 @@ exports.createReview = async (req, res) => {
   }
 };
 
-exports.getCarReviews = async (req, res) => {
+export const getCarReviews = async (req, res) => {
   try {
     const reviews = await Review.find({ carId: req.params.carId }).sort({ createdAt: -1 });
     res.json(reviews);
