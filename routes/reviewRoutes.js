@@ -1,9 +1,11 @@
 import express from 'express';
-import { createReview } from '../controllers/reviewController.js';
-import protect from '../middeleware/auth.js';
+import { createReview, getCarReviews } from '../controllers/reviewController.js';
+import authMiddleware from '../middeleware/auth.js'; // تأكد من المسار الصحيح
 
 const router = express.Router();
 
-router.post('/', protect, createReview); // المستخدم يجب أن يكون مسجلاً للدخول
+// حماية المسار باستخدام الـ middleware للتحقق من التوكن
+router.post('/', authMiddleware, createReview);
+router.get('/:carId', getCarReviews);
 
 export default router;
