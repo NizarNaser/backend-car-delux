@@ -34,7 +34,7 @@ export const getCarReviews = async (req, res) => {
 //remove comment 
 export const removeComment = async (req,res) => {
   try {
-    const sale = await Review.findById(req.body.id);
+    const comment = await Review.findById(req.body.id);
 
 
     await Review.findByIdAndDelete(req.body.id);
@@ -43,5 +43,19 @@ export const removeComment = async (req,res) => {
   } catch (error) {
     console.log(error);
         res.json({success:false,message:"Error"})
+  }
+}
+
+//all comment list
+export const listComment = async (req,res) => {
+  try {
+      const comments = await Review.find();
+
+      res.json({success:true,data:comments});
+
+  } catch (error) {
+      console.log(error);
+      res.json({success:false,message:"Error"})
+
   }
 }
