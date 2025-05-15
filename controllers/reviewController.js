@@ -30,3 +30,18 @@ export const getCarReviews = async (req, res) => {
     res.status(500).json({ message: 'Error fetching reviews', error: err });
   }
 };
+
+//remove comment 
+export const removeComment = async (req,res) => {
+  try {
+    const sale = await Review.findById(req.body.id);
+
+
+    await Review.findByIdAndDelete(req.body.id);
+    res.json({success:true,message:"comment Removed"});
+
+  } catch (error) {
+    console.log(error);
+        res.json({success:false,message:"Error"})
+  }
+}
