@@ -7,6 +7,6 @@ const router = express.Router();
 router.get('/list-comment', listComment);          // ← اجعله أولاً
 router.post('/', authMiddleware, createReview);
 router.get('/:carId', getCarReviews);              // ← بعده
-router.post('/remove/:carId', removeComment);
+router.post('/remove', removeComment);
 
 export default router;
